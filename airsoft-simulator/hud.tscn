@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="LabelMunicao" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = "-- / --"
+
+[node name="LabelMassa" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = "-- g"
+
+[node name="LabelModo" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = "SEMI"
+
+[node name="LabelHopup" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = "Hop-up: 0.00"
+
+[node name="LabelAviso" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = ""

@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://baetk5aso35bd"]
+
+[ext_resource type="Script" uid="uid://cu31yy5unhwyx" path="res://Scripts/interacao.gd" id="1_idj7w"]
+[ext_resource type="PackedScene" uid="uid://cuvolhedopudd" path="res://Scenes/AirsoftGun.tscn" id="1_r150o"]
+[ext_resource type="PackedScene" path="res://hud.tscn" id="3_kln2b"]
+[ext_resource type="Script" uid="uid://bl05kkvlevaue" path="res://Scripts/hud.gd" id="4_rgh2o"]
+
+[sub_resource type="Environment" id="Environment_r150o"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_r150o"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_idj7w"]
+size = Vector3(20, 0.2, 20)
+
+[node name="Node3D" type="Node3D" unique_id=1248419927]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=715887043]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1219610660]
+transform = Transform3D(-0.9857405, -0.017685475, -0.16734059, 0.00415804, 0.991598, -0.12929101, 0.16822118, -0.12814318, -0.97738475, 0, 3, -12.632328)
+script = ExtResource("1_idj7w")
+
+[node name="AirsoftGun" parent="." unique_id=1690076448 instance=ExtResource("1_r150o")]
+transform = Transform3D(1, 0, -0.00020943952, 0, 1, 0, 0.00020943952, 0, 1, 0, 1, 0)
+script = null
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1792873118]
+environment = SubResource("Environment_r150o")
+
+[node name="HUD" parent="." unique_id=1475216403 instance=ExtResource("3_kln2b")]
+script = ExtResource("4_rgh2o")
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=1608609367]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=1526706186]
+mesh = SubResource("BoxMesh_r150o")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1402944508]
+shape = SubResource("BoxShape3D_idj7w")

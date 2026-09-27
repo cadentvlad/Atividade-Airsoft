@@ -1,0 +1,108 @@
+[gd_scene format=3 uid="uid://baetk5aso35bd"]
+
+[ext_resource type="Script" uid="uid://cu31yy5unhwyx" path="res://scripts/interacao.gd" id="1_idj7w"]
+[ext_resource type="PackedScene" uid="uid://cuvolhedopudd" path="res://Scenes/AirsoftGun.tscn" id="1_r150o"]
+[ext_resource type="PackedScene" path="res://hud.tscn" id="3_kln2b"]
+[ext_resource type="Script" uid="uid://db1i1jsdnp1va" path="res://scripts/player.gd" id="4_rgh2o"]
+[ext_resource type="PackedScene" uid="uid://cp1ysm64h5jkm" path="res://Scenes/BB.tscn" id="5_50glp"]
+[ext_resource type="Script" uid="uid://dbcvxsie7i2y0" path="res://scripts/game_manager.gd" id="5_pbw6q"]
+[ext_resource type="Script" uid="uid://di41n13375cag" path="res://scripts/etapaconfig.gd" id="6_jw32o"]
+[ext_resource type="PackedScene" uid="uid://dgnymh7ixlcy3" path="res://Scenes/Alvo.tscn" id="7_50glp"]
+[ext_resource type="PackedScene" path="res://Scenes/Painel_jogo v3.tscn" id="9_vy5pj"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jw32o"]
+
+[sub_resource type="Sky" id="Sky_50glp"]
+sky_material = SubResource("ProceduralSkyMaterial_jw32o")
+
+[sub_resource type="Environment" id="Environment_r150o"]
+background_mode = 2
+sky = SubResource("Sky_50glp")
+ambient_light_source = 3
+
+[sub_resource type="BoxMesh" id="BoxMesh_r150o"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jw32o"]
+albedo_color = Color(0.5986973, 1, 0.36549637, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_idj7w"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pbw6q"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="Resource" id="Resource_vy5pj"]
+script = ExtResource("6_jw32o")
+metadata/_custom_type_script = "uid://di41n13375cag"
+
+[sub_resource type="Resource" id="Resource_bmxlf"]
+script = ExtResource("6_jw32o")
+escala_alvo = 0.6
+distancia = 14.0
+tempo_limite_seg = 25.0
+metadata/_custom_type_script = "uid://di41n13375cag"
+
+[sub_resource type="Resource" id="Resource_4kpch"]
+script = ExtResource("6_jw32o")
+quantidade_alvos = 4
+escala_alvo = 0.35
+distancia = 20.0
+tempo_limite_seg = 20.0
+metadata/_custom_type_script = "uid://di41n13375cag"
+
+[node name="Main" type="Node3D" unique_id=1248419927]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=715887043]
+light_color = Color(1, 1, 0.05490196, 1)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1792873118]
+environment = SubResource("Environment_r150o")
+
+[node name="HUD" parent="." unique_id=1475216403 instance=ExtResource("3_kln2b")]
+arma_path = NodePath("../Player/Head/Camera3D/AirsoftGun")
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=1608609367]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=1526706186]
+mesh = SubResource("BoxMesh_r150o")
+surface_material_override/0 = SubResource("StandardMaterial3D_jw32o")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1402944508]
+shape = SubResource("BoxShape3D_idj7w")
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=1320087578]
+script = ExtResource("4_rgh2o")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=64339632]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_pbw6q")
+
+[node name="Head" type="Node3D" parent="Player" unique_id=1622144528]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player/Head" unique_id=1219610660]
+transform = Transform3D(-0.99007523, 0.022244943, 0.13876659, 0.0041580396, 0.991598, -0.12929098, -0.14047673, -0.12743081, -0.98184913, 0, 0, 0)
+script = ExtResource("1_idj7w")
+
+[node name="AirsoftGun" parent="Player/Head/Camera3D" unique_id=1690076448 instance=ExtResource("1_r150o")]
+transform = Transform3D(-0.9901047, 0.00415804, -0.14026937, 0.022218252, 0.99159783, -0.12743545, 0.13856094, -0.12929097, -0.9818781, -0.00041580433, -0.09915984, 0.012929097)
+bb_scene = ExtResource("5_50glp")
+
+[node name="Game Manager" type="Node3D" parent="." unique_id=251395642 node_paths=PackedStringArray("ponto_central")]
+script = ExtResource("5_pbw6q")
+etapas = Array[ExtResource("6_jw32o")]([SubResource("Resource_vy5pj"), SubResource("Resource_bmxlf"), SubResource("Resource_4kpch")])
+ponto_central = NodePath("../Ponto Central")
+alvo_scene = ExtResource("7_50glp")
+arma_path = NodePath("../Player/Head/Camera3D/AirsoftGun")
+
+[node name="Ponto Central" type="Marker3D" parent="." unique_id=1973592928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 10)
+
+[node name="PainelJogo" parent="." unique_id=723559245 node_paths=PackedStringArray("gerenciador") instance=ExtResource("9_vy5pj")]
+gerenciador = NodePath("../Game Manager")
+
+[editable path="HUD"]
+[editable path="Player/Head/Camera3D/AirsoftGun"]

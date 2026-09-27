@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cp1ysm64h5jkm"]
+
+[ext_resource type="Script" uid="uid://52r3pn2oarcd" path="res://scripts/bb.gd" id="1_ijjsa"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_6hyit"]
+radius = 0.03
+height = 0.06
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ijjsa"]
+radius = 0.003
+
+[node name="Bb" type="RigidBody3D" unique_id=332928987]
+mass = 0.002
+continuous_cd = true
+script = ExtResource("1_ijjsa")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1110777334]
+mesh = SubResource("SphereMesh_6hyit")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=64581728]
+shape = SubResource("SphereShape3D_ijjsa")

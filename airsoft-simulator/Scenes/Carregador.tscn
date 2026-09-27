@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dm3new40kx4fh"]
+
+[ext_resource type="Script" uid="uid://bw7bupjxyuu83" path="res://Scripts/carregador_pickup.gd" id="1_yafaq"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_28yid"]
+size = Vector3(0.25, 0.5, 0.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ev2ws"]
+size = Vector3(0.25, 0.5, 0.25)
+
+[node name="Node3D" type="Node3D" unique_id=615530380]
+
+[node name="Area3D" type="Area3D" parent="." unique_id=1196507580]
+script = ExtResource("1_yafaq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=128909184]
+shape = SubResource("BoxShape3D_28yid")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D" unique_id=702740187]
+mesh = SubResource("BoxMesh_ev2ws")
