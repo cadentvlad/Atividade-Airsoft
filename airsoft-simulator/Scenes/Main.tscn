@@ -6,9 +6,16 @@
 [ext_resource type="Script" uid="uid://db1i1jsdnp1va" path="res://scripts/player.gd" id="4_rgh2o"]
 [ext_resource type="PackedScene" uid="uid://cp1ysm64h5jkm" path="res://Scenes/BB.tscn" id="5_50glp"]
 [ext_resource type="Script" uid="uid://dbcvxsie7i2y0" path="res://scripts/game_manager.gd" id="5_pbw6q"]
+[ext_resource type="AudioStream" uid="uid://blbtxqkoxf2sy" path="res://Áudio/ARMA.wav" id="6_erwvk"]
+[ext_resource type="AudioStream" uid="uid://dumk61jixxbhq" path="res://Áudio/empty-gun-shot.wav" id="6_grg3l"]
 [ext_resource type="Script" uid="uid://di41n13375cag" path="res://scripts/etapaconfig.gd" id="6_jw32o"]
 [ext_resource type="PackedScene" uid="uid://dgnymh7ixlcy3" path="res://Scenes/Alvo.tscn" id="7_50glp"]
+[ext_resource type="AudioStream" uid="uid://st45qhtrw8s8" path="res://Áudio/reload.wav" id="8_1p5hy"]
 [ext_resource type="PackedScene" path="res://Scenes/Painel_jogo v3.tscn" id="9_vy5pj"]
+[ext_resource type="PackedScene" path="res://Scenes/Carregador_pickup.tscn" id="10_bmxlf"]
+[ext_resource type="PackedScene" path="res://Scenes/Arma_pickup.tscn" id="11_4kpch"]
+[ext_resource type="AudioStream" uid="uid://bljkkvlw6f06n" path="res://Áudio/bells-target-hit.wav" id="12_erwvk"]
+[ext_resource type="AudioStream" uid="uid://dmq6ayjppfjyf" path="res://Áudio/ambient.wav" id="15_h1m7h"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jw32o"]
 
@@ -35,6 +42,8 @@ height = 1.8
 
 [sub_resource type="Resource" id="Resource_vy5pj"]
 script = ExtResource("6_jw32o")
+quantidade_alvos = 5
+tempo_limite_seg = 40.0
 metadata/_custom_type_script = "uid://di41n13375cag"
 
 [sub_resource type="Resource" id="Resource_bmxlf"]
@@ -47,9 +56,9 @@ metadata/_custom_type_script = "uid://di41n13375cag"
 [sub_resource type="Resource" id="Resource_4kpch"]
 script = ExtResource("6_jw32o")
 quantidade_alvos = 4
-escala_alvo = 0.35
+escala_alvo = 0.3
 distancia = 20.0
-tempo_limite_seg = 20.0
+tempo_limite_seg = 15.0
 metadata/_custom_type_script = "uid://di41n13375cag"
 
 [node name="Main" type="Node3D" unique_id=1248419927]
@@ -86,10 +95,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 [node name="Camera3D" type="Camera3D" parent="Player/Head" unique_id=1219610660]
 transform = Transform3D(-0.99007523, 0.022244943, 0.13876659, 0.0041580396, 0.991598, -0.12929098, -0.14047673, -0.12743081, -0.98184913, 0, 0, 0)
 script = ExtResource("1_idj7w")
+arma_path = NodePath("AirsoftGun")
 
 [node name="AirsoftGun" parent="Player/Head/Camera3D" unique_id=1690076448 instance=ExtResource("1_r150o")]
 transform = Transform3D(-0.9901047, 0.00415804, -0.14026937, 0.022218252, 0.99159783, -0.12743545, 0.13856094, -0.12929097, -0.9818781, -0.00041580433, -0.09915984, 0.012929097)
 bb_scene = ExtResource("5_50glp")
+som_disparo = ExtResource("6_erwvk")
+som_sem_municao = ExtResource("6_grg3l")
+som_troca_carregador = ExtResource("8_1p5hy")
+volume_efeitos_db = -1.0
 
 [node name="Game Manager" type="Node3D" parent="." unique_id=251395642 node_paths=PackedStringArray("ponto_central")]
 script = ExtResource("5_pbw6q")
@@ -97,12 +111,46 @@ etapas = Array[ExtResource("6_jw32o")]([SubResource("Resource_vy5pj"), SubResour
 ponto_central = NodePath("../Ponto Central")
 alvo_scene = ExtResource("7_50glp")
 arma_path = NodePath("../Player/Head/Camera3D/AirsoftGun")
+som_acerto = ExtResource("12_erwvk")
 
 [node name="Ponto Central" type="Marker3D" parent="." unique_id=1973592928]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 10)
 
 [node name="PainelJogo" parent="." unique_id=723559245 node_paths=PackedStringArray("gerenciador") instance=ExtResource("9_vy5pj")]
 gerenciador = NodePath("../Game Manager")
+
+[node name="CarregadorPickup" parent="." unique_id=417925967 instance=ExtResource("10_bmxlf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 3)
+massa_bb_g = 0.3
+
+[node name="CarregadorPickup2" parent="." unique_id=1457250524 instance=ExtResource("10_bmxlf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2, 3)
+tipo = 0
+massa_bb_g = 0.4
+
+[node name="CarregadorPickup3" parent="." unique_id=1417799501 instance=ExtResource("10_bmxlf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2, 10)
+tipo = 2
+
+[node name="CarregadorPickup4" parent="." unique_id=396919040 instance=ExtResource("10_bmxlf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -3)
+tipo = 3
+massa_bb_g = 0.2
+
+[node name="ArmaPickup" parent="." unique_id=1020644525 instance=ExtResource("11_4kpch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2, 3)
+
+[node name="ArmaPickup2" parent="." unique_id=1820154776 instance=ExtResource("11_4kpch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2, -2)
+tipo = 2
+
+[node name="ArmaPickup3" parent="." unique_id=1345055093 instance=ExtResource("11_4kpch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, 0)
+tipo = 3
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=2058782421]
+stream = ExtResource("15_h1m7h")
+autoplay = true
 
 [editable path="HUD"]
 [editable path="Player/Head/Camera3D/AirsoftGun"]
