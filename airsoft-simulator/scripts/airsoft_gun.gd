@@ -8,14 +8,17 @@ signal hopup_alterado(valor: float)
 signal modo_alterado(modo: int)
 signal carregador_alterado(carregador: Carregador)
 signal carregador_rejeitado(motivo: String)
+signal perfil_alterado(modelo: String)
 
 enum ModoTiro { SEMI, AUTO }
 
 @export var bb_scene: PackedScene
 
+# Os campos abaixo definem a arma INICIAL do jogador. Ao trocar de arma no chão,
+# eles passam a refletir a arma equipada (ver _aplicar_perfil).
 @export_category("Compatibilidade")
 @export var tipo_compativel: TipoCarregador.Tipo = TipoCarregador.Tipo.RIFLE
-@export var modelo: String = "AK-47 Airsoft"
+@export var modelo: String = "Rifle"
 
 # Modelo simplificado (opção 1 do enunciado): o ajuste da mola define
 # diretamente a energia do disparo em joules.
@@ -30,14 +33,25 @@ enum ModoTiro { SEMI, AUTO }
 @export var hopup_min: float = 0.0
 @export var hopup_max: float = 2.0
 @export var hopup_step: float = 0.05
-var hopup_atual: float = 0.1
+@export var hopup_inicial: float = 0.05
+var hopup_atual: float
 
 @export_category("Carregador inicial")
 @export var capacidade_inicial: int = 30
 @export var massa_inicial_g: float = 0.25
 
+@export_category("Áudio")
+@export var som_disparo: AudioStream
+@export var som_sem_municao: AudioStream
+@export var som_troca_carregador: AudioStream
+@export var volume_efeitos_db: float = -6.0
+
+var _audio_disparo: AudioStreamPlayer
+var _audio_extra: AudioStreamPlayer
+
 var modo_tiro: ModoTiro = ModoTiro.SEMI
 var carregador_atual: Carregador = null
+var perfil_atual: PerfilArma = null
 var gatilho_pressionado: bool = false
 var _proximo_disparo_permitido_ms: int = 0
 
@@ -45,9 +59,55 @@ var _proximo_disparo_permitido_ms: int = 0
 
 
 func _ready() -> void:
-	print(">>> AirsoftGun _ready() rodou. Node path: ", get_path())
-	if carregador_atual == null:
-		equipar_carregador(Carregador.criar(tipo_compativel, capacidade_inicial, massa_inicial_g))
+	_audio_disparo = _criar_player(8) # vários sons ao mesmo tempo no modo AUTO
+	_audio_extra = _criar_player(2)
+	hopup_atual = clamp(hopup_inicial, hopup_min, hopup_max)
+	var inicial := PerfilArma.new()
+	inicial.modelo = modelo
+	inicial.tipo_compativel = tipo_compativel
+	inicial.ajuste_mola_joules = ajuste_mola_joules
+	inicial.rpm = rpm
+	inicial.rotacoes_por_disparo = rotacoes_por_disparo
+	inicial.capacidade_inicial = capacidade_inicial
+	inicial.massa_inicial_g = massa_inicial_g
+	_aplicar_perfil(inicial)
+
+
+func _criar_player(polifonia: int) -> AudioStreamPlayer:
+	var player := AudioStreamPlayer.new()
+	player.max_polyphony = polifonia
+	player.volume_db = volume_efeitos_db
+	add_child(player)
+	return player
+
+
+func _tocar(player: AudioStreamPlayer, som: AudioStream) -> void:
+	if som == null:
+		return
+	player.stream = som
+	player.play()
+
+
+func _aplicar_perfil(p: PerfilArma) -> void:
+	perfil_atual = p
+	modelo = p.modelo
+	tipo_compativel = p.tipo_compativel
+	ajuste_mola_joules = p.ajuste_mola_joules
+	rpm = p.rpm
+	rotacoes_por_disparo = p.rotacoes_por_disparo
+	if p.carregador == null:
+		p.carregador = Carregador.criar(p.tipo_compativel, p.capacidade_inicial, p.massa_inicial_g)
+	carregador_atual = p.carregador
+	perfil_alterado.emit(modelo)
+	carregador_alterado.emit(carregador_atual)
+
+
+## Equipa uma nova arma e devolve a anterior (com o carregador dela), para ser largada no chão.
+## Não zera o intervalo de disparo, então trocar de arma não permite antecipar o próximo tiro.
+func equipar_perfil(novo: PerfilArma) -> PerfilArma:
+	var anterior := perfil_atual
+	_aplicar_perfil(novo)
+	return anterior
 
 
 # ROF (disparos por segundo) a partir do RPM do motor e do número de rotações
@@ -82,7 +142,10 @@ func equipar_carregador(novo: Carregador) -> bool:
 		)
 		return false
 	carregador_atual = novo
+	if perfil_atual:
+		perfil_atual.carregador = novo
 	carregador_alterado.emit(carregador_atual)
+	_tocar(_audio_extra, som_troca_carregador)
 	return true
 
 
@@ -105,7 +168,10 @@ func shoot() -> void:
 		return
 
 	if not carregador_atual.consumir():
+		# O clique de arma vazia também respeita o intervalo, senão tocaria a cada frame no AUTO
+		_proximo_disparo_permitido_ms = Time.get_ticks_msec() + int(get_intervalo_disparo() * 1000.0)
 		sem_municao.emit()
+		_tocar(_audio_extra, som_sem_municao)
 		return
 
 	var massa_kg = carregador_atual.massa_bb_kg()
@@ -125,6 +191,7 @@ func shoot() -> void:
 	print("ROF: ", get_rof(), " BB/s | Intervalo: ", get_intervalo_disparo(), " s")
 	print("Munição: ", carregador_atual.quantidade_atual, "/", carregador_atual.capacidade)
 
+	_tocar(_audio_disparo, som_disparo)
 	disparo_realizado.emit(velocidade)
 
 

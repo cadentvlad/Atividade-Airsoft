@@ -1,8 +1,6 @@
 class_name TipoCarregador
 extends RefCounted
 
-## Enum único usado tanto pela Arma quanto pelo Carregador para decidir compatibilidade.
-## Nunca comparar strings digitadas livremente — sempre comparar valores neste enum.
 enum Tipo {
 	SHOTGUN,
 	RIFLE,
@@ -21,3 +19,15 @@ static func nome(tipo: Tipo) -> String:
 		Tipo.PISTOL_GLOCK:
 			return "Pistol Glock"
 	return "Desconhecido"
+
+static func cor(tipo: Tipo) -> Color:
+	match tipo:
+		Tipo.SHOTGUN:
+			return Color(0.9, 0.3, 0.2)
+		Tipo.RIFLE:
+			return Color(0.2, 0.6, 0.9)
+		Tipo.PISTOL_1911:
+			return Color(0.9, 0.8, 0.2)
+		Tipo.PISTOL_GLOCK:
+			return Color(0.6, 0.3, 0.8)
+	return Color.WHITE
